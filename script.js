@@ -25,6 +25,8 @@ const rootInput = document.getElementById('rootInput');
 const autoFillBtn = document.getElementById('autoFillBtn');
 const apiStatus = document.getElementById('apiStatus');
 
+const GAS_ENDPOINT = 'https://script.google.com/macros/s/YOUR_DEPLOY_ID/exec';
+
 let deck = [];
 let currentCardIndex = 0;
 let isFlipped = false;
@@ -116,6 +118,32 @@ function clearForm() {
   exampleInput.value = '';
   rootInput.value = '';
   resetFormState();
+}
+
+async function sendWordToBackend(entry) {
+  if (!GAS_ENDPOINT || GAS_ENDPOINT.includes('YOUR_DEPLOY_ID')) {
+    apiStatus.textContent = '請先設定 GAS_ENDPOINT，才能將單字送到後端。';
+    return;
+  }
+
+  try {
+    const response = await fetch(GAS_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(entry)
+    });
+
+    const result = await response.json();
+    if (response.ok && result.status === 'success') {
+      apiStatus.textContent = '單字已送出後端，後端已成功儲存。';
+    } else {
+      apiStatus.textContent = '已儲存至本機，但後端回傳失敗，請檢查 Apps Script 部署。';
+    }
+  } catch (error) {
+    apiStatus.textContent = '已儲存至本機，但無法連線後端，請稍後再試。';
+  }
 }
 
 function toggleForm() {
@@ -253,7 +281,7 @@ function initEventListeners() {
 
   newWordToggle.addEventListener('click', toggleForm);
 
-  wordForm.addEventListener('submit', (event) => {
+  wordForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     const word = englishInput.value.trim();
     if (!word) return;
@@ -276,6 +304,7 @@ function initEventListeners() {
     renderWordList();
     updateStudyStats();
     renderStudyCard();
+    await sendWordToBackend(entry);
     toggleForm();
   });
 
