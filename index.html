@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>背單字卡 - 純前端學習</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">背單字卡</div>
+    <nav>
+      <button id="showStudyBtn" class="tab-button active">學習頁</button>
+      <button id="showManageBtn" class="tab-button">管理頁</button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section id="studySection" class="page-section active">
+      <div class="study-panel">
+        <div class="deck-info">
+          <div class="deck-count">共有 <span id="wordCount">0</span> 個單字</div>
+          <div class="deck-position">第 <span id="currentIndex">0</span> / <span id="totalCount">0</span></div>
+        </div>
+
+        <div class="card-container" id="wordCard" aria-label="單字卡片" tabindex="0">
+          <div class="card-face card-front" id="cardFront">
+            <div class="label">English</div>
+            <div class="word-text" id="wordText">請先新增單字</div>
+          </div>
+          <div class="card-face card-back" id="cardBack">
+            <div class="label">翻譯</div>
+            <div class="detail" id="wordTranslation">—</div>
+            <div class="label">詞性</div>
+            <div class="detail" id="wordPartOfSpeech">—</div>
+            <div class="label">例句</div>
+            <div class="detail" id="wordExample">—</div>
+            <div class="label">字根分析</div>
+            <div class="detail" id="wordRoot">—</div>
+          </div>
+        </div>
+
+        <div class="study-actions">
+          <button id="prevBtn" class="secondary">上一個</button>
+          <button id="flipBtn" class="primary">翻頁</button>
+          <button id="nextBtn" class="secondary">下一個</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="manageSection" class="page-section">
+      <div class="manage-panel">
+        <div class="manage-top">
+          <h2>單字管理</h2>
+          <button id="newWordToggle" class="primary">新增單字</button>
+        </div>
+
+        <form id="wordForm" class="word-form hidden">
+          <div class="form-row">
+            <label for="englishInput">英文單字</label>
+            <input id="englishInput" type="text" placeholder="請輸入英文單字" required />
+          </div>
+          <div class="form-row">
+            <label for="translateInput">翻譯</label>
+            <input id="translateInput" type="text" placeholder="翻譯內容" />
+          </div>
+          <div class="form-row">
+            <label for="posInput">詞性</label>
+            <input id="posInput" type="text" placeholder="詞性" />
+          </div>
+          <div class="form-row">
+            <label for="exampleInput">例句</label>
+            <textarea id="exampleInput" rows="3" placeholder="例句"></textarea>
+          </div>
+          <div class="form-row">
+            <label for="rootInput">字根分析</label>
+            <textarea id="rootInput" rows="3" placeholder="字根 / 詞源 / 分析"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="autoFillBtn" class="secondary">自動填入</button>
+            <button type="submit" class="primary">儲存單字</button>
+          </div>
+          <div id="apiStatus" class="status-message"></div>
+        </form>
+
+        <div class="word-list" id="wordList"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
