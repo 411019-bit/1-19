@@ -28,7 +28,7 @@ const uploadStatus = document.getElementById('uploadStatus');
 const autoFillBtn = document.getElementById('autoFillBtn');
 const apiStatus = document.getElementById('apiStatus');
 
-const GAS_ENDPOINT = 'https://script.googlhttps://script.google.com/macros/s/AKfycbwomxkjGcyPQmqL8l5vyj2OiGhe_6zdb2NherXFVUunx50dpIQ8YxP2Bhgd9LRC4jprlQ/exece.com/macros/s/YOUR_DEPLOY_ID/exec';
+const GAS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwomxkjGcyPQmqL8l5vyj2OiGhe_6zdb2NherXFVUunx50dpIQ8YxP2Bhgd9LRC4jprlQ/exec';
 
 let deck = [];
 let currentCardIndex = 0;
