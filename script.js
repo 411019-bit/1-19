@@ -22,6 +22,9 @@ const translateInput = document.getElementById('translateInput');
 const posInput = document.getElementById('posInput');
 const exampleInput = document.getElementById('exampleInput');
 const rootInput = document.getElementById('rootInput');
+const dataFileInput = document.getElementById('dataFileInput');
+const parseDataBtn = document.getElementById('parseDataBtn');
+const uploadStatus = document.getElementById('uploadStatus');
 const autoFillBtn = document.getElementById('autoFillBtn');
 const apiStatus = document.getElementById('apiStatus');
 
@@ -143,6 +146,107 @@ async function sendWordToBackend(entry) {
     }
   } catch (error) {
     apiStatus.textContent = '已儲存至本機，但無法連線後端，請稍後再試。';
+  }
+}
+
+function parseUploadedData(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const content = reader.result;
+      if (!content) {
+        reject(new Error('檔案內容為空。'));
+        return;
+      }
+
+      if (file.type.includes('json') || file.name.endsWith('.json')) {
+        try {
+          const json = JSON.parse(content);
+          const entries = Array.isArray(json) ? json : [json];
+          resolve(entries.map((item) => ({
+            word: item.word || item.Word || item.英文 || '',
+            translation: item.translation || item.Translation || item.翻譯 || '',
+            partOfSpeech: item.partOfSpeech || item.PartOfSpeech || item.詞性 || '',
+            example: item.example || item.Example || item.例句 || '',
+            rootAnalysis: item.rootAnalysis || item.RootAnalysis || item.字根分析 || ''
+          })));
+        } catch (error) {
+          reject(new Error('JSON 解析失敗，請確認檔案格式。'));
+        }
+      } else {
+        const lines = content.split(/\r?\n/).filter(Boolean);
+        if (!lines.length) {
+          reject(new Error('CSV 檔案為空。'));
+          return;
+        }
+
+        const headers = lines[0].split(',').map((header) => header.trim().replace(/^"|"$/g, ''));
+        const rows = lines.slice(1);
+
+        const entries = rows.map((row) => {
+          const values = row.split(',').map((value) => value.trim().replace(/^"|"$/g, ''));
+          const item = {};
+          headers.forEach((header, index) => {
+            item[header] = values[index] || '';
+          });
+          return {
+            word: item.word || item.Word || item.英文 || '',
+            translation: item.translation || item.Translation || item.翻譯 || '',
+            partOfSpeech: item.partOfSpeech || item.PartOfSpeech || item.詞性 || '',
+            example: item.example || item.Example || item.例句 || '',
+            rootAnalysis: item.rootAnalysis || item.RootAnalysis || item.字根分析 || ''
+          };
+        }).filter((entry) => entry.word);
+
+        if (!entries.length) {
+          reject(new Error('CSV 內沒有可用的單字資料。'));
+          return;
+        }
+
+        resolve(entries);
+      }
+    };
+
+    reader.onerror = () => reject(new Error('讀取檔案時發生錯誤。'));
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+async function handleParseData() {
+  uploadStatus.textContent = '';
+
+  const file = dataFileInput.files[0];
+  if (!file) {
+    uploadStatus.textContent = '請先上傳一個 JSON 或 CSV 檔案。';
+    return;
+  }
+
+  parseDataBtn.disabled = true;
+  parseDataBtn.textContent = '解析中…';
+
+  try {
+    const entries = await parseUploadedData(file);
+    if (!entries.length) {
+      uploadStatus.textContent = '解析後未取得任何有效單字。';
+      return;
+    }
+
+    entries.forEach((entry) => {
+      deck.push(entry);
+      sendWordToBackend(entry);
+    });
+
+    saveDeck();
+    renderWordList();
+    updateStudyStats();
+    renderStudyCard();
+    uploadStatus.textContent = `已解析並新增 ${entries.length} 筆資料。`; 
+  } catch (error) {
+    uploadStatus.textContent = error.message;
+  } finally {
+    parseDataBtn.disabled = false;
+    parseDataBtn.textContent = '解析數據';
   }
 }
 
@@ -307,6 +411,8 @@ function initEventListeners() {
     await sendWordToBackend(entry);
     toggleForm();
   });
+
+  parseDataBtn.addEventListener('click', handleParseData);
 
   autoFillBtn.addEventListener('click', async () => {
     const word = englishInput.value.trim();

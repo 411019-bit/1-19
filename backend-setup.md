@@ -99,6 +99,42 @@ const GAS_ENDPOINT = 'https://script.google.com/macros/s/你的部署代碼/exec
 3. 後端收到資料後，寫入 Google 試算表 `Words` 工作表。
 4. 後端回傳成功狀態，前端顯示狀態訊息。
 
+### 上傳檔案解析
+
+管理頁也支援上傳 JSON 或 CSV 檔案，按下「解析數據」後會：
+
+1. 讀取上傳檔案內容。
+2. 解析成單字資料陣列。
+3. 將每筆資料儲存在 localStorage 中。
+4. 逐筆以 `fetch()` POST 到 Google Apps Script 後端。
+
+支援的欄位名稱：`word` / `Word` / `英文`
+`translation` / `Translation` / `翻譯`
+`partOfSpeech` / `PartOfSpeech` / `詞性`
+`example` / `Example` / `例句`
+`rootAnalysis` / `RootAnalysis` / `字根分析`
+
+範例 JSON 檔案格式：
+
+```json
+[
+  {
+    "word": "apple",
+    "translation": "蘋果",
+    "partOfSpeech": "noun",
+    "example": "I like eating an apple.",
+    "rootAnalysis": "-"
+  }
+]
+```
+
+範例 CSV 檔案格式：
+
+```csv
+Word,Translation,PartOfSpeech,Example,RootAnalysis
+apple,蘋果,noun,"I like eating an apple.",-
+```
+
 ## 6. 測試流程
 
 1. 開啟 `index.html`。

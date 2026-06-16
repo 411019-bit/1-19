@@ -55,6 +55,17 @@
           <button id="newWordToggle" class="primary">新增單字</button>
         </div>
 
+        <div class="word-form">
+          <div class="form-row">
+            <label for="dataFileInput">上傳資料檔</label>
+            <input id="dataFileInput" type="file" accept=".json,.csv,application/json,text/csv" />
+          </div>
+          <div class="form-actions">
+            <button type="button" id="parseDataBtn" class="primary">解析數據</button>
+          </div>
+          <div id="uploadStatus" class="status-message"></div>
+        </div>
+
         <form id="wordForm" class="word-form hidden">
           <div class="form-row">
             <label for="englishInput">英文單字</label>
